@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { MonthYearIcon, YearIcon, CompareMonthsIcon, CompareYearsIcon, PerformanceTrendIcon, InformationIcon } from './Icons';
-import { PlusCircle, Mic } from 'lucide-react';
+import { 
+  Calendar, 
+  BarChart2, 
+  TrendingUp, 
+  PieChart, 
+  GitCompare, 
+  Info, 
+  PlusCircle, 
+  Mic 
+} from 'lucide-react';
 
 const DashboardContainer = styled.div`
   background-color: #F0F9FF;
@@ -11,31 +19,35 @@ const DashboardContainer = styled.div`
 `;
 
 const DashboardContent = styled.div`
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
 `;
 
 const DashboardTitle = styled.h1`
-  font-size: 32px;
+  font-size: 36px;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 32px;
-  color: #1F2937;
+  margin-bottom: 40px;
+  color: #1E40AF;
 `;
 
 const DashboardGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
   
   @media (min-width: 768px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(4, 1fr);
   }
 `;
 
 const DashboardCard = styled.div`
   background-color: ${props => props.color};
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 24px;
   display: flex;
@@ -44,13 +56,13 @@ const DashboardCard = styled.div`
   justify-content: center;
   aspect-ratio: 1 / 1;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s, scale 0.3s;
+  transition: all 0.3s ease;
   opacity: ${props => props.isVisible ? 1 : 0};
-  scale: ${props => props.isVisible ? 1 : 0.8};
+  transform: ${props => props.isVisible ? 'scale(1) translateY(0)' : 'scale(0.8) translateY(20px)'};
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
   }
 
   &:active {
@@ -60,24 +72,20 @@ const DashboardCard = styled.div`
 `;
 
 const CardIcon = styled.div`
-  width: 100%;
-  height: auto;
+  width: 80px;
+  height: 80px;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  svg {
-    width: 100%;
-    height: 100%;
-    max-width: 150px;
-    max-height: 150px;
-  }
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  padding: 16px;
 `;
 
 const CardLabel = styled.span`
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
   color: #4B5563;
   text-align: center;
 `;
@@ -86,18 +94,18 @@ const MainView = ({ setView }) => {
   const [visibleCards, setVisibleCards] = useState([]);
 
   const cards = [
-    { icon: <MonthYearIcon />, label: "Ultimo Mese", color: "#E6F3FF", onClick: () => setView('lastMonth') },
-    { icon: <YearIcon />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
-    { icon: <CompareMonthsIcon />, label: "Confronta mesi", color: "#D1FAE5", onClick: () => setView('compareMonths') },
-    { icon: <CompareYearsIcon />, label: "Confronta Anni", color: "#EDE9FE", onClick: () => setView('compareYears') },
-    { icon: <Mic size="100%" color="red" />, label: "Statistiche Fonici", color: "#FEE2E2", onClick: () => setView('statisticheFonici') },
-    { icon: <PerformanceTrendIcon />, label: "Performance Trend", color: "#D1FAE5", onClick: () => console.log("Performance Trend") },
-    { icon: <InformationIcon />, label: "Informazioni", color: "#E0E7FF", onClick: () => setView('information') },
-    { icon: <PlusCircle size="100%" />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
+    { icon: <Calendar size={48} />, label: "Ultimo Mese", color: "#E6F3FF", onClick: () => setView('lastMonth') },
+    { icon: <BarChart2 size={48} />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
+    { icon: <GitCompare size={48} />, label: "Confronta mesi", color: "#D1FAE5", onClick: () => setView('compareMonths') },
+    { icon: <TrendingUp size={48} />, label: "Confronta Anni", color: "#EDE9FE", onClick: () => setView('compareYears') },
+    { icon: <Mic size={48} />, label: "Statistiche Fonici", color: "#FEE2E2", onClick: () => setView('statisticheFonici') },
+    { icon: <PieChart size={48} />, label: "Performance Trend", color: "#D1FAE5", onClick: () => setView('performanceTrend') },
+    { icon: <Info size={48} />, label: "Informazioni", color: "#E0E7FF", onClick: () => setView('information') },
+    { icon: <PlusCircle size={48} />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
   ];
 
   useEffect(() => {
-    const totalAnimationTime = 1000;
+    const totalAnimationTime = 1200;
     const delay = totalAnimationTime / cards.length;
     
     const timer = setInterval(() => {
@@ -106,9 +114,7 @@ const MainView = ({ setView }) => {
           clearInterval(timer);
           return prev;
         }
-        const remaining = cards.length - prev.length;
-        const newIndexes = [...Array(remaining)].map((_, i) => prev.length + i);
-        return [...prev, ...newIndexes.sort(() => Math.random() - 0.5)];
+        return [...prev, prev.length];
       });
     }, delay);
 
@@ -118,7 +124,7 @@ const MainView = ({ setView }) => {
   return (
     <DashboardContainer>
       <DashboardContent>
-        <DashboardTitle>Statistiche Studio Pumaisdue</DashboardTitle>
+        <DashboardTitle>DASHBOARD</DashboardTitle>
         <DashboardGrid>
           {cards.map((card, index) => (
             <DashboardCard
