@@ -1,26 +1,125 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
-import { getYearData, getAvailableYears } from './data';
+import { getYearData, getAvailableYears, getCurrentYearAndMonth } from './data';
 
-const YearDataDisplay = ({ yearData, yearLabel }) => {
+const ViewContainer = styled.div`
+  background-color: #F0F9FF;
+  min-height: 100vh;
+  padding: 24px;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+`;
+
+const Content = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const BackButton = styled.button`
+  background: #4B5563;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin-bottom: 24px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #374151;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: 32px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #1F2937;
+`;
+
+const ComparisonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+`;
+
+const Column = styled.div`
+  width: 100%;
+
+  @media (min-width: 768px) {
+    width: 32%;
+  }
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+`;
+
+const Card = styled.div`
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const CardTitle = styled.h2`
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  text-align: center;
+`;
+
+const DataSection = styled.div`
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: #F3F4F6;
+  border-radius: 4px;
+`;
+
+const DataTitle = styled.h3`
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const DifferenceSection = styled(DataSection)`
+  display: flex;
+  align-items: center;
+  color: ${props => props.isPositive ? '#10B981' : '#EF4444'};
+`;
+
+const YearDataDisplay = ({ yearData, yearLabel, limitedToMonth }) => {
   if (!yearData) return null;
 
   return (
-    <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center' }}>{yearLabel}</h2>
-      <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#F3F4F6', borderRadius: '4px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Totale Turni</h3>
+    <Card>
+      <CardTitle>{yearLabel}</CardTitle>
+      <DataSection>
+        <DataTitle>Totale Turni {limitedToMonth ? `(fino a ${limitedToMonth})` : ''}</DataTitle>
         <p>{yearData.totaleTurni}</p>
-      </div>
-      <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#F3F4F6', borderRadius: '4px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>Media Mensile</h3>
+      </DataSection>
+      <DataSection>
+        <DataTitle>Media Mensile</DataTitle>
         <p>{yearData.mediaMensile.toFixed(2)}</p>
-      </div>
-    </div>
+      </DataSection>
+    </Card>
   );
 };
 
-const DifferenceDisplay = ({ yearData1, yearData2, year1Label, year2Label }) => {
+const DifferenceDisplay = ({ yearData1, yearData2, year1Label, year2Label, limitedToMonth }) => {
   if (!yearData1 || !yearData2) return null;
 
   const calculateDifference = (value1, value2) => {
@@ -34,29 +133,29 @@ const DifferenceDisplay = ({ yearData1, yearData2, year1Label, year2Label }) => 
 
   const renderDifference = (label, diff, percentage) => {
     const isPositive = diff > 0;
-    const color = isPositive ? '#10B981' : '#EF4444';
     const Icon = isPositive ? TrendingUp : TrendingDown;
 
     return (
-      <div style={{ marginBottom: '16px', padding: '12px', backgroundColor: '#F3F4F6', borderRadius: '4px' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '8px' }}>{label}</h3>
-        <div style={{ display: 'flex', alignItems: 'center', color: color }}>
-          <Icon size={20} style={{ marginRight: '8px' }} />
-          <p>
-            {isPositive ? '+' : ''}{diff.toFixed(2)} ({isPositive ? '+' : ''}{percentage}%)
-          </p>
-        </div>
-      </div>
+      <DifferenceSection isPositive={isPositive}>
+        <DataTitle>{label}</DataTitle>
+        <Icon size={20} style={{ marginRight: '8px' }} />
+        <p>
+          {isPositive ? '+' : ''}{diff.toFixed(2)} ({isPositive ? '+' : ''}{percentage}%)
+        </p>
+      </DifferenceSection>
     );
   };
 
   return (
-    <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' }}>
-      <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center' }}>Differenze</h2>
-      <p style={{ textAlign: 'center', marginBottom: '16px' }}>{year1Label} rispetto a {year2Label}</p>
+    <Card>
+      <CardTitle>Differenze</CardTitle>
+      <p style={{ textAlign: 'center', marginBottom: '16px' }}>
+        {year1Label} rispetto a {year2Label}
+        {limitedToMonth ? ` (fino a ${limitedToMonth})` : ''}
+      </p>
       {renderDifference('Totale Turni', totalTurniDiff.diff, totalTurniDiff.percentage)}
       {renderDifference('Media Mensile', mediaMensileDiff.diff, mediaMensileDiff.percentage)}
-    </div>
+    </Card>
   );
 };
 
@@ -66,101 +165,92 @@ const CompareYearsView = ({ setView }) => {
   const [yearData1, setYearData1] = useState(null);
   const [yearData2, setYearData2] = useState(null);
   const [availableYears, setAvailableYears] = useState([]);
+  const [limitedToMonth, setLimitedToMonth] = useState(null);
+
+  const { currentYear, currentMonth } = getCurrentYearAndMonth();
 
   useEffect(() => {
     setAvailableYears(getAvailableYears());
   }, []);
 
   useEffect(() => {
-    if (selectedYear1) {
-      setYearData1(getYearData(selectedYear1));
-    }
-  }, [selectedYear1]);
+    if (selectedYear1 && selectedYear2) {
+      let limitMonth = 12;
+      if (selectedYear1 == currentYear || selectedYear2 == currentYear) {
+        // Calcoliamo il mese precedente
+        limitMonth = currentMonth > 1 ? currentMonth - 1 : 12;
+        const limitMonthName = getMonthName(limitMonth);
+        setLimitedToMonth(limitMonthName);
+      } else {
+        setLimitedToMonth(null);
+      }
 
-  useEffect(() => {
-    if (selectedYear2) {
-      setYearData2(getYearData(selectedYear2));
+      setYearData1(getYearData(selectedYear1, limitMonth));
+      setYearData2(getYearData(selectedYear2, limitMonth));
     }
-  }, [selectedYear2]);
+  }, [selectedYear1, selectedYear2, currentYear, currentMonth]);
+
+  const getMonthName = (monthNumber) => {
+    const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
+                        'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+    return monthNames[monthNumber - 1];
+  };
 
   return (
-    <div style={{
-      backgroundColor: '#F0F9FF',
-      minHeight: '100vh',
-      padding: '24px',
-      fontFamily: "'Helvetica Neue', Arial, sans-serif",
-    }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <button 
-          onClick={() => setView('main')} 
-          style={{
-            background: '#4B5563',
-            color: 'white',
-            border: 'none',
-            borderRadius: '8px',
-            padding: '10px 20px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: '16px',
-            marginBottom: '24px',
-            transition: 'background-color 0.3s',
-          }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#374151'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#4B5563'}
-        >
+    <ViewContainer>
+      <Content>
+        <BackButton onClick={() => setView('main')}>
           <ArrowLeft size={20} style={{ marginRight: '8px' }} />
           Torna alla Dashboard
-        </button>
+        </BackButton>
         
-        <h1 style={{
-          fontSize: '32px',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          marginBottom: '32px',
-          color: '#1F2937',
-        }}>
-          Confronta Anni
-        </h1>
+        <Title>Confronta Anni</Title>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-          <div style={{ width: '32%' }}>
-            <select 
+        <ComparisonContainer>
+          <Column>
+            <Select 
               value={selectedYear1} 
               onChange={(e) => setSelectedYear1(e.target.value)}
-              style={{ width: '100%', padding: '8px', fontSize: '16px', borderRadius: '4px', marginBottom: '16px' }}
             >
               <option value="">Seleziona il primo anno</option>
               {availableYears.map(year => (
                 <option key={year.value} value={year.value}>{year.label}</option>
               ))}
-            </select>
-            <YearDataDisplay yearData={yearData1} yearLabel={availableYears.find(y => y.value === selectedYear1)?.label} />
-          </div>
-          <div style={{ width: '28%' }}>
+            </Select>
+            <YearDataDisplay 
+              yearData={yearData1} 
+              yearLabel={availableYears.find(y => y.value === selectedYear1)?.label}
+              limitedToMonth={limitedToMonth}
+            />
+          </Column>
+          <Column>
             <DifferenceDisplay 
               yearData1={yearData1} 
               yearData2={yearData2} 
               year1Label={availableYears.find(y => y.value === selectedYear1)?.label}
               year2Label={availableYears.find(y => y.value === selectedYear2)?.label}
+              limitedToMonth={limitedToMonth}
             />
-          </div>
-          <div style={{ width: '32%' }}>
-            <select 
+          </Column>
+          <Column>
+            <Select 
               value={selectedYear2} 
               onChange={(e) => setSelectedYear2(e.target.value)}
-              style={{ width: '100%', padding: '8px', fontSize: '16px', borderRadius: '4px', marginBottom: '16px' }}
             >
               <option value="">Seleziona il secondo anno</option>
               {availableYears.map(year => (
                 <option key={year.value} value={year.value}>{year.label}</option>
               ))}
-            </select>
-            <YearDataDisplay yearData={yearData2} yearLabel={availableYears.find(y => y.value === selectedYear2)?.label} />
-          </div>
-        </div>
-      </div>
-    </div>
+            </Select>
+            <YearDataDisplay 
+              yearData={yearData2} 
+              yearLabel={availableYears.find(y => y.value === selectedYear2)?.label}
+              limitedToMonth={limitedToMonth}
+            />
+          </Column>
+        </ComparisonContainer>
+      </Content>
+    </ViewContainer>
   );
 };
 

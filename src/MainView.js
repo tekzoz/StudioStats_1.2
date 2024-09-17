@@ -11,7 +11,7 @@ const DashboardContainer = styled.div`
 `;
 
 const DashboardContent = styled.div`
-  max-width: 768px;
+  max-width: 900px;
   margin: 0 auto;
 `;
 
@@ -25,8 +25,12 @@ const DashboardTitle = styled.h1`
 
 const DashboardGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 24px;
+  
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 `;
 
 const DashboardCard = styled.div`
@@ -56,8 +60,8 @@ const DashboardCard = styled.div`
 `;
 
 const CardIcon = styled.div`
-  width: 256px;
-  height: 256px;
+  width: 100%;
+  height: auto;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -66,6 +70,8 @@ const CardIcon = styled.div`
   svg {
     width: 100%;
     height: 100%;
+    max-width: 150px;
+    max-height: 150px;
   }
 `;
 
@@ -84,10 +90,10 @@ const MainView = ({ setView }) => {
     { icon: <YearIcon />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
     { icon: <CompareMonthsIcon />, label: "Confronta mesi", color: "#D1FAE5", onClick: () => setView('compareMonths') },
     { icon: <CompareYearsIcon />, label: "Confronta Anni", color: "#EDE9FE", onClick: () => setView('compareYears') },
-    { icon: <Mic size={120} color="red" />, label: "Statistiche Fonici", color: "#FEE2E2", onClick: () => setView('statisticheFonici') },
+    { icon: <Mic size="100%" color="red" />, label: "Statistiche Fonici", color: "#FEE2E2", onClick: () => setView('statisticheFonici') },
     { icon: <PerformanceTrendIcon />, label: "Performance Trend", color: "#D1FAE5", onClick: () => console.log("Performance Trend") },
     { icon: <InformationIcon />, label: "Informazioni", color: "#E0E7FF", onClick: () => setView('information') },
-    { icon: <PlusCircle size={120} />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
+    { icon: <PlusCircle size="100%" />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
   ];
 
   useEffect(() => {

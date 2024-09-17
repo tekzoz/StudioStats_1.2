@@ -746,8 +746,8 @@ export const getAnnualAverageData = () => {
   };
 };
 
-export const getYearData = (year) => {
-  const yearData = monthsData.filter(m => m.year.toString() === year);
+export const getYearData = (year, limitMonth = 12) => {
+  const yearData = monthsData.filter(m => m.year.toString() === year && m.month <= limitMonth);
   if (yearData.length > 0) {
     const totaleTurni = yearData.reduce((total, month) => total + calculateTotalShifts(month), 0);
     return {
@@ -756,6 +756,12 @@ export const getYearData = (year) => {
     };
   }
   return null;
+};
+
+// Aggiungi questa nuova funzione per ottenere l'anno e il mese correnti
+export const getCurrentYearAndMonth = () => {
+  const now = new Date();
+  return { currentYear: now.getFullYear(), currentMonth: now.getMonth() + 1 };
 };
 
 export const getAvailableYears = () => {
