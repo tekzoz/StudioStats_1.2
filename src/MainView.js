@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { 
   Calendar, 
@@ -93,7 +93,7 @@ const CardLabel = styled.span`
 const MainView = ({ setView }) => {
   const [visibleCards, setVisibleCards] = useState([]);
 
-  const cards = [
+  const cards = useMemo(() => [
     { icon: <Calendar size={48} />, label: "Ultimo Mese", color: "#E6F3FF", onClick: () => setView('lastMonth') },
     { icon: <BarChart2 size={48} />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
     { icon: <GitCompare size={48} />, label: "Confronta mesi", color: "#D1FAE5", onClick: () => setView('compareMonths') },
@@ -102,7 +102,7 @@ const MainView = ({ setView }) => {
     { icon: <PieChart size={48} />, label: "Performance Trend", color: "#D1FAE5", onClick: () => setView('performanceTrend') },
     { icon: <Info size={48} />, label: "Informazioni", color: "#E0E7FF", onClick: () => setView('information') },
     { icon: <PlusCircle size={48} />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
-  ];
+  ], [setView]);
 
   useEffect(() => {
     const totalAnimationTime = 1200;
