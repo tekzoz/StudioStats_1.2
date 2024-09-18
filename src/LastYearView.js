@@ -3,7 +3,8 @@ import { ArrowLeft, Calendar, TrendingUp, TrendingDown, Activity, List, Clock } 
 import { getYearlyData } from './data';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from 'recharts';
 
-const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
+const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+const monthNamesShort = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
 
 const processYearlyData = (data) => {
   if (!data || Object.keys(data).length === 0) return null;
@@ -86,6 +87,10 @@ const calculateComparisons = (currentYear, currentData, previousYears, type) => 
   return comparisons;
 };
 
+const roundToHalf = (num) => {
+  return Math.round(num * 2) / 2;
+};
+
 const StatCard = ({ icon, label, value, comparisons, backgroundColor }) => (
   <div style={{
     backgroundColor,
@@ -124,7 +129,7 @@ const YearlyChart = ({ data, averageTurni, lastAvailableMonth }) => {
   const chartData = Object.entries(data)
     .filter(([month]) => Number(month) <= lastAvailableMonth)
     .map(([month, { totaleTurni }]) => ({
-      name: monthNames[parseInt(month)],
+      name: monthNamesShort[parseInt(month)],
       turniDoppiaggio: totaleTurni
     }));
 
@@ -156,32 +161,46 @@ const YearlyChart = ({ data, averageTurni, lastAvailableMonth }) => {
   );
 };
 
-const MonthlyListCard = ({ data, lastAvailableMonth }) => (
-  <div style={{
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    padding: '20px',
-    marginBottom: '20px',
-  }}
-  role="region"
-  aria-label="Lista Mensile dei Turni di Doppiaggio">
-    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-      <List size={24} color='#4B5563' aria-hidden="true" />
-      <span style={{ marginLeft: '12px', fontSize: '18px', fontWeight: '500', color: '#4B5563' }}>Lista Mensile dei Turni di Doppiaggio</span>
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {Object.entries(data)
-        .filter(([month]) => Number(month) <= lastAvailableMonth)
-        .map(([month, { totaleTurni }]) => (
-          <div key={month} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', borderBottom: '1px solid #E5E7EB', paddingBottom: '8px' }}>
-            <span style={{ color: '#4B5563' }}>{monthNames[parseInt(month)]}</span>
-            <span style={{ fontWeight: 'bold', color: '#1F2937' }}>{totaleTurni}</span>
+const MonthlyListCard = ({ data, lastAvailableMonth }) => {
+  const monthlyData = Object.entries(data)
+    .filter(([month]) => Number(month) <= lastAvailableMonth)
+    .map(([month, { totaleTurni }]) => ({ month: parseInt(month), totaleTurni }));
+
+  const maxTurni = Math.max(...monthlyData.map(m => m.totaleTurni));
+  const minTurni = Math.min(...monthlyData.map(m => m.totaleTurni));
+
+  return (
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      padding: '20px',
+      marginBottom: '20px',
+    }}
+    role="region"
+    aria-label="Lista Mensile dei Turni di Doppiaggio">
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+        <List size={24} color='#4B5563' aria-hidden="true" />
+        <span style={{ marginLeft: '12px', fontSize: '18px', fontWeight: '500', color: '#4B5563' }}>Lista Mensile dei Turni di Doppiaggio</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {monthlyData.map(({ month, totaleTurni }) => (
+          <div key={month} style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            marginBottom: '8px', 
+            borderBottom: '1px solid #E5E7EB', 
+            paddingBottom: '8px',
+            color: totaleTurni === maxTurni ? 'green' : totaleTurni === minTurni ? 'red' : 'inherit'
+          }}>
+            <span>{monthNames[month]}</span>
+            <span style={{ fontWeight: 'bold' }}>{totaleTurni}</span>
           </div>
         ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const LastYearView = ({ setView, year = new Date().getFullYear() }) => {
   const yearlyData = getYearlyData(year);
@@ -222,10 +241,12 @@ const LastYearView = ({ setView, year = new Date().getFullYear() }) => {
   const avgComparisons = calculateComparisons(year, processedData, [year-1, year-2, year-3], 'average');
   const dailyAvgComparisons = calculateComparisons(year, processedData, [year-1, year-2, year-3], 'daily');
 
+  const lastMonth = monthNames[processedData.lastAvailableMonth];
+
   const stats = [
     { 
       icon: <Calendar />, 
-      label: 'Totale Turni di Doppiaggio Annuali', 
+      label: `Totale Turni di Doppiaggio Annuali (fino al mese di ${lastMonth})`, 
       value: processedData.totalTurni,
       comparisons: totalComparisons,
       backgroundColor: '#E6F3FF'
@@ -240,7 +261,7 @@ const LastYearView = ({ setView, year = new Date().getFullYear() }) => {
     { 
       icon: <Clock />, 
       label: 'Media Turni di Doppiaggio Giornalieri', 
-      value: processedData.avgDailyTurni.toFixed(1),
+      value: roundToHalf(processedData.avgDailyTurni).toFixed(1),
       comparisons: dailyAvgComparisons,
       backgroundColor: '#F0FFF0'
     },
@@ -292,13 +313,13 @@ const LastYearView = ({ setView, year = new Date().getFullYear() }) => {
           fontSize: '32px',
           fontWeight: 'bold',
           textAlign: 'center',
-          marginBottom: '8px',
+          marginBottom: '4px',
           color: '#1F2937',
         }}>
           Statistiche Anno
         </h1>
         <h2 style={{
-          fontSize: '28px',
+          fontSize: '40px',
           fontWeight: 'bold',
           textAlign: 'center',
           marginBottom: '32px',

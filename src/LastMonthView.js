@@ -25,7 +25,7 @@ const StatCard = ({ icon, label, value, comparison, backgroundColor, component }
     {comparison && (
       <div style={{ marginTop: '8px', fontSize: '14px' }}>
         <div style={{ color: comparison.prevMonth.value === 'N/A' ? 'gray' : (parseFloat(comparison.prevMonth.value) > 0 ? 'green' : 'red') }}>
-          {comparison.prevMonth.value} ({comparison.prevMonth.percentage}) rispetto a {comparison.prevMonthName}
+          {comparison.prevMonth.value} ({comparison.prevMonth.percentage}) rispetto a {comparison.prevMonthName} {comparison.prevMonthYear}
         </div>
         <div style={{ color: comparison.annual.value === 'N/A' ? 'gray' : (parseFloat(comparison.annual.value) > 0 ? 'green' : 'red') }}>
           {comparison.annual.value} ({comparison.annual.percentage}) rispetto alla media annuale {comparison.year}
@@ -47,6 +47,10 @@ const calculateComparison = (current, previous) => {
   };
 };
 
+const roundToHalf = (num) => {
+  return Math.round(num * 2) / 2;
+};
+
 const LastMonthView = ({ setView }) => {
   const latestMonthData = getLatestMonthData();
   const previousMonthData = getPreviousMonthData();
@@ -54,21 +58,26 @@ const LastMonthView = ({ setView }) => {
 
   const currentDate = new Date();
   const lastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-  const monthNames = ['GENNAIO', 'FEBBRAIO', 'MARZO', 'APRILE', 'MAGGIO', 'GIUGNO', 'LUGLIO', 'AGOSTO', 'SETTEMBRE', 'OTTOBRE', 'NOVEMBRE', 'DICEMBRE'];
+  const previousMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 2, 1);
+  const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
   const displayMonth = monthNames[lastMonth.getMonth()];
   const displayYear = lastMonth.getFullYear();
+  const previousMonthName = monthNames[previousMonth.getMonth()];
+  const previousMonthYear = previousMonth.getFullYear();
 
   const comparisonDataTurni = {
     prevMonth: calculateComparison(latestMonthData.totaleTurni, previousMonthData.totaleTurni),
     annual: calculateComparison(latestMonthData.totaleTurni, annualAverageData.mediaAnnuale),
-    prevMonthName: monthNames[(lastMonth.getMonth() + 11) % 12],
+    prevMonthName: previousMonthName,
+    prevMonthYear: previousMonthYear,
     year: displayYear
   };
 
   const comparisonDataMedia = {
-    prevMonth: calculateComparison(latestMonthData.mediaGiornaliera, previousMonthData.mediaGiornaliera),
-    annual: calculateComparison(latestMonthData.mediaGiornaliera, annualAverageData.mediaAnnuale / 30), // Approssimazione
-    prevMonthName: monthNames[(lastMonth.getMonth() + 11) % 12],
+    prevMonth: calculateComparison(roundToHalf(latestMonthData.mediaGiornaliera), roundToHalf(previousMonthData.mediaGiornaliera)),
+    annual: calculateComparison(roundToHalf(latestMonthData.mediaGiornaliera), roundToHalf(annualAverageData.mediaAnnuale / 30)), // Approssimazione
+    prevMonthName: previousMonthName,
+    prevMonthYear: previousMonthYear,
     year: displayYear
   };
 
@@ -83,14 +92,14 @@ const LastMonthView = ({ setView }) => {
     { 
       icon: <Clock />, 
       label: 'Media Turni di Doppiaggio Giornaliera (Lun-Ven)', 
-      value: latestMonthData.mediaGiornaliera.toFixed(1),
+      value: roundToHalf(latestMonthData.mediaGiornaliera).toFixed(1),
       comparison: comparisonDataMedia,
       backgroundColor: '#FFF0E6'
     },
     { 
       icon: <Gauge />, 
-      label: 'Utilizzo delle Sale', 
-      component: <PerformanceGauge value={latestMonthData.mediaGiornaliera} />,
+      label: 'Utilizzo delle Sale di Doppiaggio', 
+      component: <PerformanceGauge value={roundToHalf(latestMonthData.mediaGiornaliera)} />,
       backgroundColor: '#F0E6FF'
     },
   ];
