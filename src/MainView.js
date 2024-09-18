@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { 
   Calendar, 
@@ -58,8 +58,6 @@ const DashboardCard = styled.div`
   aspect-ratio: 1 / 1;
   cursor: pointer;
   transition: all 0.3s ease;
-  opacity: ${props => props.isVisible ? 1 : 0};
-  transform: ${props => props.isVisible ? 'scale(1) translateY(0)' : 'scale(0.8) translateY(20px)'};
 
   &:hover {
     transform: translateY(-10px) scale(1.05);
@@ -102,8 +100,6 @@ const CopyrightText = styled.p`
 `;
 
 const MainView = ({ setView }) => {
-  const [visibleCards, setVisibleCards] = useState([]);
-
   const cards = useMemo(() => [
     { icon: <Calendar size={48} />, label: "Ultimo Mese", color: "#E6F3FF", onClick: () => setView('lastMonth') },
     { icon: <BarChart2 size={48} />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
@@ -115,23 +111,6 @@ const MainView = ({ setView }) => {
     { icon: <PlusCircle size={48} />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
   ], [setView]);
 
-  useEffect(() => {
-    const totalAnimationTime = 1200;
-    const delay = totalAnimationTime / cards.length;
-    
-    const timer = setInterval(() => {
-      setVisibleCards(prev => {
-        if (prev.length === cards.length) {
-          clearInterval(timer);
-          return prev;
-        }
-        return [...prev, prev.length];
-      });
-    }, delay);
-
-    return () => clearInterval(timer);
-  }, [cards.length]);
-
   return (
     <DashboardContainer>
       <DashboardContent>
@@ -142,7 +121,6 @@ const MainView = ({ setView }) => {
               key={index}
               color={card.color}
               onClick={card.onClick}
-              isVisible={visibleCards.includes(index)}
               role="button"
               aria-label={card.label}
             >
