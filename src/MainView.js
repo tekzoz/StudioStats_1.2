@@ -16,6 +16,7 @@ const DashboardContainer = styled.div`
   min-height: 100vh;
   padding: 24px;
   font-family: 'Helvetica Neue', Arial, sans-serif;
+  position: relative;
 `;
 
 const DashboardContent = styled.div`
@@ -90,6 +91,16 @@ const CardLabel = styled.span`
   text-align: center;
 `;
 
+const CopyrightText = styled.p`
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: #6B7280;
+  text-align: center;
+`;
+
 const MainView = ({ setView }) => {
   const [visibleCards, setVisibleCards] = useState([]);
 
@@ -141,6 +152,7 @@ const MainView = ({ setView }) => {
           ))}
         </DashboardGrid>
       </DashboardContent>
+      <CopyrightText>Version 1.2.2 - © 2024 Marco Augusto Comba</CopyrightText>
     </DashboardContainer>
   );
 };

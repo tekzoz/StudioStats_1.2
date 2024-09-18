@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled, { keyframes, createGlobalStyle } from 'styled-components';
 import { Mic, BarChart2, Calendar, TrendingUp } from 'lucide-react';
 
+
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.cdnfonts.com/css/sf-pro-display');
   
@@ -173,6 +174,13 @@ const AnimatedBackground = () => {
   return <CanvasBackground id="backgroundCanvas" />;
 };
 
+  const AdditionalInfo = styled.p`
+  font-size: 0.9rem;
+  color: #4B5563;
+  margin-top: 10px;
+  line-height: 1.4;
+`;
+
 const LandingPage = ({ onEnter }) => {
   const [showContent, setShowContent] = useState(false);
 
@@ -200,6 +208,10 @@ const LandingPage = ({ onEnter }) => {
               Analizza i trend e confronta i dati.
             </Subtitle>
             <EnterButton onClick={onEnter}>Entra nella Dashboard</EnterButton>
+            <AdditionalInfo>
+              Per una migliore esperienza, ruotare il telefono in orizzontale.<br />
+              Versione 1.2.2
+            </AdditionalInfo>
           </ContentWrapper>
         )}
       </LandingContainer>
