@@ -12,88 +12,91 @@ import {
 } from 'lucide-react';
 
 const DashboardContainer = styled.div`
-  background-color: #F0F9FF;
+  background-color: #f8fafc;
   min-height: 100vh;
-  padding: 24px;
-  font-family: 'Helvetica Neue', Arial, sans-serif;
+  padding: 2rem;
+  font-family: 'Arial', sans-serif;
 `;
 
 const DashboardContent = styled.div`
-  max-width: 1200px;
+  max-width: 800px;
   margin: 0 auto;
 `;
 
 const DashboardTitle = styled.h1`
-  font-size: 36px;
+  font-size: 2.5rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 40px;
-  color: #1E40AF;
+  margin-bottom: 2rem;
+  color: #1e293b;
 `;
 
-const DashboardGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+const CardList = styled.ul`
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const CardItem = styled.li`
+  margin-bottom: 1rem;
 `;
 
 const DashboardCard = styled.div`
-  background-color: ${props => props.color};
-  border-radius: 8px;
-  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
   cursor: pointer;
 `;
 
 const CardIcon = styled.div`
-  margin-bottom: 12px;
+  margin-right: 1rem;
+  color: ${props => props.color};
 `;
 
 const CardLabel = styled.span`
-  font-size: 16px;
-  font-weight: 600;
-  color: #4B5563;
-  text-align: center;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #334155;
 `;
 
 const CopyrightText = styled.p`
-  margin-top: 40px;
-  font-size: 12px;
-  color: #6B7280;
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  color: #64748b;
   text-align: center;
 `;
 
 const MainView = ({ setView }) => {
   const cards = [
-    { icon: <Calendar size={32} />, label: "Ultimo Mese", color: "#E6F3FF", onClick: () => setView('lastMonth') },
-    { icon: <BarChart2 size={32} />, label: "Ultimo Anno", color: "#FEF3C7", onClick: () => setView('lastYear') },
-    { icon: <GitCompare size={32} />, label: "Confronta mesi", color: "#D1FAE5", onClick: () => setView('compareMonths') },
-    { icon: <TrendingUp size={32} />, label: "Confronta Anni", color: "#EDE9FE", onClick: () => setView('compareYears') },
-    { icon: <Mic size={32} />, label: "Statistiche Fonici", color: "#FEE2E2", onClick: () => setView('statisticheFonici') },
-    { icon: <PieChart size={32} />, label: "Performance Trend", color: "#D1FAE5", onClick: () => setView('performanceTrend') },
-    { icon: <Info size={32} />, label: "Informazioni", color: "#E0E7FF", onClick: () => setView('information') },
-    { icon: <PlusCircle size={32} />, label: "Inserisci Dati", color: "#FDE68A", onClick: () => setView('dataInput') },
+    { icon: Calendar, label: "Ultimo Mese", color: "#3b82f6", onClick: () => setView('lastMonth') },
+    { icon: BarChart2, label: "Ultimo Anno", color: "#ef4444", onClick: () => setView('lastYear') },
+    { icon: GitCompare, label: "Confronta mesi", color: "#10b981", onClick: () => setView('compareMonths') },
+    { icon: TrendingUp, label: "Confronta Anni", color: "#8b5cf6", onClick: () => setView('compareYears') },
+    { icon: Mic, label: "Statistiche Fonici", color: "#f59e0b", onClick: () => setView('statisticheFonici') },
+    { icon: PieChart, label: "Performance Trend", color: "#14b8a6", onClick: () => setView('performanceTrend') },
+    { icon: Info, label: "Informazioni", color: "#6366f1", onClick: () => setView('information') },
+    { icon: PlusCircle, label: "Inserisci Dati", color: "#ec4899", onClick: () => setView('dataInput') },
   ];
 
   return (
     <DashboardContainer>
       <DashboardContent>
         <DashboardTitle>DASHBOARD</DashboardTitle>
-        <DashboardGrid>
+        <CardList>
           {cards.map((card, index) => (
-            <DashboardCard
-              key={index}
-              color={card.color}
-              onClick={card.onClick}
-            >
-              <CardIcon>{card.icon}</CardIcon>
-              <CardLabel>{card.label}</CardLabel>
-            </DashboardCard>
+            <CardItem key={index}>
+              <DashboardCard onClick={card.onClick}>
+                <CardIcon color={card.color}>
+                  <card.icon size={24} />
+                </CardIcon>
+                <CardLabel>{card.label}</CardLabel>
+              </DashboardCard>
+            </CardItem>
           ))}
-        </DashboardGrid>
+        </CardList>
         <CopyrightText>Version 1.2.2 - © 2024 Marco Augusto Comba</CopyrightText>
       </DashboardContent>
     </DashboardContainer>
